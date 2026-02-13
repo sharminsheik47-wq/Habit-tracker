@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pastel Butterfly Habit Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Splash Screen -->
+  <div id="splash-screen">
+    <div class="splash-content">
+      <div class="splash-logo">
+        <img src="assets/butterfly-badge.png" alt="Butterfly Logo" class="splash-butterfly" />
+      </div>
+      <h1 class="splash-title">Habit Tracker</h1>
+    </div>
+  </div>
+
+  <!-- Main App Container -->
+  <div id="app" class="app hidden">
+    <header class="app-header">
+      <div class="logo-title">
+        <img src="assets/butterfly-badge.png" alt="Logo" class="header-logo" />
+        <div>
+          <h1>Habits Tracker</h1>
+          <p>Your soft, lifelong transformation journal.</p>
+        </div>
+      </div>
+      <div class="header-meta">
+        <div class="meta-pill">
+          <span>Streak</span>
+          <strong id="currentStreakText">0 days</strong>
+        </div>
+        <div class="meta-pill">
+          <span>Total Days Tracked</span>
+          <strong id="totalDaysTrackedText">0</strong>
+        </div>
+        <div class="meta-pill">
+          <span>Started</span>
+          <strong id="startDateText">—</strong>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <!-- Left: Calendar + Daily Habits -->
+      <section class="column column-main">
+        <!-- Calendar -->
+        <div class="card calendar-card">
+          <div class="card-header">
+            <h2>Calendar</h2>
+            <div class="calendar-controls">
+              <button id="prevMonthBtn" class="soft-btn">&lt;</button>
+              <div id="monthYearLabel"></div>
+              <button id="nextMonthBtn" class="soft-btn">&gt;</button>
+            </div>
+          </div>
+          <div class="calendar-legend">
+            <span class="legend-item"><span class="dot streak-day"></span>Streak Day</span>
+            <span class="legend-item"><span class="dot missed-day"></span>Missed Day</span>
+            <span class="legend-item"><span class="dot badge-day"></span>Badge Day</span>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+
+        <!-- Daily Habits -->
+        <div class="card habits-card">
+          <div class="card-header">
+            <h2>Today’s Habits</h2>
+            <span id="selectedDateLabel" class="soft-label"></span>
+          </div>
+          <div class="habits-list" id="habitsList">
+            <!-- Dynamic habits -->
+          </div>
+          <div class="habit-add-row">
+            <input type="text" id="newHabitInput" placeholder="Add a gentle habit..." />
+            <button id="addHabitBtn" class="soft-btn">Add</button>
+          </div>
+          <div class="habits-footer">
+            <button id="saveDayBtn" class="primary-btn">Save Day & Update Streak</button>
+            <span id="daySummaryText" class="soft-label"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Butterfly Growth + Badges + Insights -->
+      <section class="column column-side">
+        <!-- Butterfly Growth -->
+        <div class="card butterfly-card">
+          <div class="card-header">
+            <h2>Butterfly Growth</h2>
+            <span id="butterflyStageText" class="soft-label">Egg</span>
+          </div>
+          <div class="butterfly-visual">
+            <img id="butterflyImage" src="assets/butterfly-egg.png" alt="Butterfly Stage" />
+          </div>
+          <div class="butterfly-progress">
+            <div class="progress-labels">
+              <span>Egg</span>
+              <span>Caterpillar</span>
+              <span>Chrysalis</span>
+              <span>Cocoon</span>
+              <span>Butterfly</span>
+            </div>
+            <div class="progress-bar">
+              <div id="streakProgressFill"></div>
+            </div>
+            <p class="soft-label" id="streakHintText"></p>
+          </div>
+        </div>
+
+        <!-- Badges -->
+        <div class="card badges-card">
+          <div class="card-header">
+            <h2>Butterfly Badges</h2>
+            <span class="soft-label">Every 30-day streak blooms a new butterfly.</span>
+          </div>
+          <div class="badge-list" id="badgeList">
+            <!-- Dynamic badges -->
+          </div>
+        </div>
+
+        <!-- Yearly Insights -->
+        <div class="card insights-card">
+          <div class="card-header">
+            <h2>365-Day Insights</h2>
+          </div>
+          <div id="yearLockState" class="lock-row">
+            <span class="lock-icon">🔒</span>
+            <span class="soft-label">
+              Unlocks after 365 days from your first tracked day.
+            </span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Past Year Archive Link -->
+    <footer class="app-footer">
+      <button id="openArchiveBtn" class="soft-btn">
+        <span id="archiveLockIcon">🔒</span>
+        <span>Past Year Archive</span>
+      </button>
+    </footer>
+  </div>
+
+  <!-- Popups -->
+
+  <!-- Generic overlay -->
+  <div id="overlay" class="overlay hidden"></div>
+
+  <!-- Warning popup: missed 1 day -->
+  <div id="warningPopup" class="popup hidden">
+    <div class="popup-inner">
+      <h3>Gentle Nudge</h3>
+      <p>You missed a day. Your butterfly is waiting for you tomorrow.</p>
+      <button class="primary-btn popup-close" data-popup-close="warningPopup">I’ll come back</button>
+    </div>
+  </div>
+
+  <!-- Reset popup: missed 2 consecutive days -->
+  <div id="resetPopup" class="popup hidden">
+    <div class="popup-inner">
+      <h3>Fresh Start</h3>
+      <p>Your streak fluttered back to zero after two missed days, but your journey continues.</p>
+      <button class="primary-btn popup-close" data-popup-close="resetPopup">Begin Again</button>
+    </div>
+  </div>
+
+  <!-- Badge unlocked popup -->
+  <div id="badgePopup" class="popup hidden">
+    <div class="popup-inner">
+      <h3>New Butterfly Unlocked</h3>
+      <p>You nurtured a 30-day streak and earned a new butterfly badge.</p>
+      <button class="primary-btn popup-close" data-popup-close="badgePopup">Admire</button>
+    </div>
+  </div>
+
+  <!-- Reward popup after 6 badges -->
+  <div id="rewardPopup" class="popup hidden">
+    <div class="popup-inner">
+      <h3>Garden of Growth</h3>
+      <p>
+        Six butterflies now call your garden home. Treat yourself to a real-world reward that feels kind and restorative.
+      </p>
+      <button class="primary-btn popup-close" data-popup-close="rewardPopup">I’ll Celebrate</button>
+    </div>
+  </div>
+
+  <!-- 365-day summary intro popup -->
+  <div id="yearIntroPopup" class="popup hidden">
+    <div class="popup-inner">
+      <h3>Travel Back 365 Days</h3>
+      <p>See who you were a year ago, and how gently you’ve grown since.</p>
+      <button id="yearIntroContinueBtn" class="primary-btn">Continue</button>
+    </div>
+  </div>
+
+  <!-- 365-day swipeable summary -->
+  <div id="yearSummaryPopup" class="popup hidden">
+    <div class="popup-inner year-summary-inner">
+      <h3>Your Year in Wings</h3>
+      <div class="swipe-hint">Swipe left or right, or use arrows.</div>
+      <div class="swipe-container" id="swipeContainer">
+        <div class="summary-card" data-card="streak">
+          <h4>Streak Maintenance</h4>
+          <p id="yearStreakSummaryText"></p>
+        </div>
+        <div class="summary-card" data-card="butterflies">
+          <h4>Butterflies & Rewards</h4>
+          <p id="yearButterflySummaryText"></p>
+        </div>
+        <div class="summary-card" data-card="struggle">
+          <h4>Your Gentle Challenge</h4>
+          <p id="yearStruggleSummaryText"></p>
+        </div>
+        <div class="summary-card" data-card="strength">
+          <h4>Your Daily Anchor</h4>
+          <p id="yearStrengthSummaryText"></p>
+        </div>
+      </div>
+      <div class="swipe-controls">
+        <button id="swipePrevBtn" class="soft-btn">&#8592;</button>
+        <button id="swipeNextBtn" class="soft-btn">&#8594;</button>
+      </div>
+      <button id="yearSummaryDoneBtn" class="primary-btn">Archive This Year</button>
+    </div>
+  </div>
+
+  <!-- Past Year Archive -->
+  <div id="archivePopup" class="popup hidden">
+    <div class="popup-inner archive-inner">
+      <h3>Past Year Archive</h3>
+      <div id="archiveList" class="archive-list">
+        <!-- Filled dynamically -->
+      </div>
+      <button class="primary-btn popup-close" data-popup-close="archivePopup">Close</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
